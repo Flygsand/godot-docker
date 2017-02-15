@@ -1,0 +1,16 @@
+FROM ubuntu:xenial
+MAINTAINER protomouse <root@protomou.se>
+
+RUN dpkg --add-architecture i386 \
+ && apt-get -y update \
+ && bash -c "apt-get -y install curl git build-essential gcc-multilib g++-multilib binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 mingw-w64 scons pkg-config {libx11-dev,libxcursor-dev,libasound2-dev,libfreetype6-dev,libgl1-mesa-dev,libglu1-mesa-dev,libssl-dev,libxinerama-dev,libxrandr-dev}:{i386,amd64}" \
+ && apt-get -y install libpulse-dev:amd64 libpulse0:i386 libpulse-mainloop-glib0:i386 \
+ && apt-get download libpulse-dev:i386 \
+ && dpkg --force-all -i libpulse-dev*_i386.deb \
+ && rm -f libpulse-dev*_i386.deb \
+ && ln -s /lib/i386-linux-gnu/libglib-2.0.so.0 /lib/i386-linux-gnu/libglib-2.0.so \
+ && curl -sSL https://github.com/upx/upx/releases/download/v3.93/upx-3.93-amd64_linux.tar.xz | tar -xJf- -C /usr/local/bin/ --strip-components=1 --wildcards "*/upx" \
+ && useradd -m -u 1000 user
+
+ADD build.sh /
+USER user
